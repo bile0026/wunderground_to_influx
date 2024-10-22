@@ -2,8 +2,24 @@ import configparser
 from datetime import datetime
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
+import logging
+import logging.handlers
 from pprint import pprint
 import requests
+import sys
+
+my_logger = logging.getLogger('MyLogger')
+my_logger.setLevel(logging.DEBUG)
+
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.DEBUG)
+
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
+my_logger.addHandler(handler)
+
+my_logger.info("Starting script!!!")
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -29,6 +45,8 @@ def get_weather_data(station_id, units, wu_api_key):
         "apiKey": wu_api_key,
     }
 
+    my_logger.info(f"Gathering weather data from {station_id}")
+
     try:
         response = requests.get(base_url, params=params, timeout=30)
         response.raise_for_status()  # Raises HTTPError for bad responses (4xx, 5xx)
@@ -36,13 +54,17 @@ def get_weather_data(station_id, units, wu_api_key):
         return _weather_data
     except requests.exceptions.RequestException as e:
         print(f"Error fetching weather data: {e}")
+        my_logger.critical(f"Error fetching weather data: {e}")
         return None
 
 
-def write_to_influxdb(weather_data, influx_url, token, org, bucket):
+def write_to_influxdb(location_label, weather_data, influx_url, token, org, bucket):
+    """Write data gathered from Wunderground API to influxdb."""
     # Initialize InfluxDB client
     client = InfluxDBClient(url=influx_url, token=token, org=org)
     write_api = client.write_api(write_options=SYNCHRONOUS)
+
+    my_logger.debug(f"Building influxdb datapoint for {location_label}.")
 
     # Extract relevant data
     observation = weather_data["observations"][0]
@@ -74,6 +96,7 @@ def write_to_influxdb(weather_data, influx_url, token, org, bucket):
     point = (
         Point("weather")
         .tag("stationID", station_id)
+        .tag("location", location_label)
         .tag("latitude", latitude)
         .tag("longitude", longitude)
         .tag("elevation", elevation)
@@ -98,7 +121,8 @@ def write_to_influxdb(weather_data, influx_url, token, org, bucket):
     # Write the data to InfluxDB
     write_api.write(bucket=bucket, org=org, record=point)
 
-    print("Data written to InfluxDB")
+    my_logger.info(f"{location_label} Data written to InfluxDB")
+    print(f"{location_label} Data written to InfluxDB")
 
 
 for location in locations:
@@ -111,9 +135,17 @@ for location in locations:
             pprint(weather_data)
 
             write_to_influxdb(
+                location_label=location,
                 weather_data=weather_data,
                 influx_url=influxdb_url,
                 token=influxdb_token,
                 org=influxdb_org,
                 bucket=influxdb_bucket
             )
+
+if common['enable_healthcheck']:
+    try:
+        requests.get(f"https://hc-ping.com/{common['hc_guid']}", timeout=10)
+    except requests.RequestException as e:
+        my_logger.critical(f"Failed to ping healthcheck: {e}")
+        print("Ping failed: %s" % e)
