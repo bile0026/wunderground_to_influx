@@ -39,7 +39,7 @@ def get_weather_data(station_id, units, wu_api_key):
         return None
 
 
-def write_to_influxdb(weather_data, influx_url, token, org, bucket):
+def write_to_influxdb(location_label, weather_data, influx_url, token, org, bucket):
     # Initialize InfluxDB client
     client = InfluxDBClient(url=influx_url, token=token, org=org)
     write_api = client.write_api(write_options=SYNCHRONOUS)
@@ -47,6 +47,7 @@ def write_to_influxdb(weather_data, influx_url, token, org, bucket):
     # Extract relevant data
     observation = weather_data["observations"][0]
     station_id = observation["stationID"]
+    location_label = location_label
     country = observation["country"]
     neighborhood = observation["neighborhood"]
     obs_time = observation["obsTimeUtc"]
@@ -74,6 +75,7 @@ def write_to_influxdb(weather_data, influx_url, token, org, bucket):
     point = (
         Point("weather")
         .tag("stationID", station_id)
+        .tag("location", location_label)
         .tag("latitude", latitude)
         .tag("longitude", longitude)
         .tag("elevation", elevation)
@@ -111,6 +113,7 @@ for location in locations:
             pprint(weather_data)
 
             write_to_influxdb(
+                location_label=location,
                 weather_data=weather_data,
                 influx_url=influxdb_url,
                 token=influxdb_token,
