@@ -72,7 +72,7 @@ RUN --mount=type=cache,target=/root/.cache \
 # PRODUCTION
 # Final image used for runtime
 ################################
-FROM python-base as production
+FROM python-base AS production
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 
 # Copy the rest of your application code to the container

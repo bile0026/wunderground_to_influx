@@ -1,6 +1,11 @@
 [COMMON]
 api_key =
 
+# healthchecks.io ping
+enable_healthcheck = false
+# uuid and slug separated by forward slash
+hc_guid =
+
 # e for english, m for metric, h for hybrid
 unit_of_measure = e
 
