@@ -1,0 +1,21 @@
+[COMMON]
+api_key =
+
+# e for english, m for metric, h for hybrid
+unit_of_measure = e
+
+# influxdb parameters to write data
+influxdb_server = 127.0.0.1
+influxdb_port = 8086
+influxdb_api_key = NotAStrongToken0=
+influxdb_org = home
+influxdb_bucket = weather-data
+
+[LOCATION1]
+station_id = KWIOCONO117
+
+[LOCATION2]
+station_id = KILROSCO37
+
+[LOCATION3]
+station_id = KWILAKEM18
