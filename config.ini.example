@@ -1,6 +1,9 @@
 [COMMON]
 api_key =
 
+# interval to scrape data (in minutes)
+interval = 5
+
 # healthchecks.io ping
 enable_healthcheck = false
 # uuid and slug separated by forward slash
