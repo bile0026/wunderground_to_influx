@@ -145,6 +145,7 @@ for location in locations:
             if common["enable_healthcheck"]:
                 try:
                     requests.get(f"https://hc-ping.com/{common['hc_guid']}", timeout=10)
+                    my_logger.info(f"Healthchecks ping send successfully!")
                 except requests.RequestException as e:
                     my_logger.critical(f"Failed to ping healthcheck: {e}")
                     print("Ping failed: %s" % e)
