@@ -8,13 +8,13 @@ from pprint import pprint
 import requests
 import sys
 
-my_logger = logging.getLogger('MyLogger')
+my_logger = logging.getLogger("MyLogger")
 my_logger.setLevel(logging.DEBUG)
 
 handler = logging.StreamHandler(sys.stdout)
 handler.setLevel(logging.DEBUG)
 
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 handler.setFormatter(formatter)
 
 my_logger.addHandler(handler)
@@ -140,12 +140,14 @@ for location in locations:
                 influx_url=influxdb_url,
                 token=influxdb_token,
                 org=influxdb_org,
-                bucket=influxdb_bucket
+                bucket=influxdb_bucket,
             )
-
-if common['enable_healthcheck']:
-    try:
-        requests.get(f"https://hc-ping.com/{common['hc_guid']}", timeout=10)
-    except requests.RequestException as e:
-        my_logger.critical(f"Failed to ping healthcheck: {e}")
-        print("Ping failed: %s" % e)
+            if common["enable_healthcheck"]:
+                try:
+                    requests.get(f"https://hc-ping.com/{common['hc_guid']}", timeout=10)
+                except requests.RequestException as e:
+                    my_logger.critical(f"Failed to ping healthcheck: {e}")
+                    print("Ping failed: %s" % e)
+        else:
+            my_logger.critical(f"No Weather data retrieved for {_loc}")
+            sys.exit(f"There was an issue retrieving weather data for location {_loc}")
