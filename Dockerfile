@@ -3,7 +3,6 @@
 # Keep this syntax directive! It's used to enable Docker BuildKit
 
 # Based on https://github.com/python-poetry/poetry/discussions/1879?sort=top#discussioncomment-216865
-# but I try to keep it updated (see history)
 
 ################################
 # PYTHON-BASE
@@ -81,27 +80,10 @@ COPY . /app
 WORKDIR /app
 
 # Install cron to handle script intervals
-RUN apt-get update && apt-get install -y cron
+RUN apt-get update && apt-get install -y procps
 
-# copy the crontab file into the cron directory
-RUN cp /app/crontab /etc/cron.d/weather-cron
+# Set the default command to run your job.py script
+CMD ["/opt/pysetup/.venv/bin/python", "wunderground_to_influx/job.py"]
 
-# Give execution rights on the cron job
-RUN chmod 0744 /etc/cron.d/weather-cron
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD pgrep python || exit 1
 
-# Apply cron job
-RUN crontab /etc/cron.d/weather-cron
-
-RUN touch /var/log/cron.log
-
-# Start the cron service
-CMD cron -f && tail -f /var/log/cron.log
-
-# Copy the start.sh script to the container
-# COPY start.sh /usr/local/bin/start.sh
-
-# Give execution rights to the start.sh script
-# RUN chmod +x /usr/local/bin/start.sh
-
-# Set the entrypoint to the start.sh script
-# ENTRYPOINT ["/usr/local/bin/start.sh"]

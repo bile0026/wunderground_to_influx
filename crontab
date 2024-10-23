@@ -1,3 +1,0 @@
-# adjust the interval to your specifications
-
-*/5 * * * * cd /app && /opt/pysetup/.venv/bin/python wunderground_to_influx/main.py >> /var/log/cron.log 2>&1
