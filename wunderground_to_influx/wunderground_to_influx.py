@@ -62,16 +62,19 @@ def run_weather_job():
 
         # Extract relevant data
         observation = weather_data["observations"][0]
+        realtime_frequency = observation["realtimeFrequency"]
         station_id = observation["stationID"]
         country = observation["country"]
         neighborhood = observation["neighborhood"]
         obs_time = observation["obsTimeUtc"]
         temperature = observation["imperial"]["temp"]
         humidity = observation["humidity"]
+        heat_index = observation["imperial"]["heatIndex"]
         dew_point = observation["imperial"]["dewpt"]
         wind_speed = observation["imperial"]["windSpeed"]
         wind_direction = observation["winddir"]
         wind_chill = observation["imperial"]["windChill"]
+        wind_gust = observation["imperial"]["windGust"]
         solar_radiation = observation["solarRadiation"]
         uv = observation["uv"]
         pressure = observation["imperial"]["pressure"]
@@ -86,6 +89,7 @@ def run_weather_job():
         point = (
             Point("weather")
             .tag("stationID", station_id)
+            .tag("realtime_frequency", realtime_frequency)
             .tag("location", location_label)
             .tag("latitude", latitude)
             .tag("longitude", longitude)
@@ -93,9 +97,11 @@ def run_weather_job():
             .tag("country", country)
             .tag("neighborhood", neighborhood)
             .field("temperature", temperature)
+            .field("heat_index", heat_index)
             .field("humidity", humidity)
             .field("dew_point", dew_point)
             .field("wind_speed", wind_speed)
+            .field("wind_gust", wind_gust)
             .field("wind_direction", wind_direction)
             .field("wind_chill", wind_chill)
             .field("solar_radiation", solar_radiation)
