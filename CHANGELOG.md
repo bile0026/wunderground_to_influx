@@ -1,6 +1,38 @@
 # CHANGELOG
 
 
+## v0.4.0 (2024-10-24)
+
+### Features
+
+* feat: ✨ add additional parameters to be tracked ([`23ca66b`](https://github.com/bile0026/wunderground_to_influx/commit/23ca66b9601980844f7b7d5325042817be9341a6))
+
+### Unknown
+
+* Merge pull request #4 from bile0026:develop
+
+feat: ✨ add additional parameters to be tracked ([`f895fd0`](https://github.com/bile0026/wunderground_to_influx/commit/f895fd0194b4098100788d84de2c34921376ed8a))
+
+
+## v0.3.0 (2024-10-23)
+
+### Bug Fixes
+
+* fix: 🐛 update logging ([`9b84ba8`](https://github.com/bile0026/wunderground_to_influx/commit/9b84ba868537573d56f4071a4cda042943f97e90))
+
+* fix: 🐛 adjust healthcheck and failure of script ([`9c59769`](https://github.com/bile0026/wunderground_to_influx/commit/9c59769d83aeea6d60d32d630e85d519b95f8955))
+
+### Features
+
+* feat: ✨ migrate cron to python schedule module ([`6cae7d7`](https://github.com/bile0026/wunderground_to_influx/commit/6cae7d72b2b55492896540b41fc7e97b18168aee))
+
+### Unknown
+
+* Merge pull request #3 from bile0026/develop
+
+Fix logging and scheduling ([`5c0ad32`](https://github.com/bile0026/wunderground_to_influx/commit/5c0ad3244db6c6a87c39537b5477083a7d6b552b))
+
+
 ## v0.2.0 (2024-10-22)
 
 ### Bug Fixes
