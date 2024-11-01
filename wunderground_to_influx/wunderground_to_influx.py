@@ -10,9 +10,12 @@ import requests
 import sys
 
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 logging.info("Script setup complete!")
+
 
 def run_weather_job():
     """Main function to gather weather data and write to InfluxDB"""
@@ -27,7 +30,9 @@ def run_weather_job():
 
     api_key = common["api_key"]
     unit_of_measure = common["unit_of_measure"]
-    influxdb_url = f"http://{common['influxdb_server']}:{common['influxdb_port']}"
+    influxdb_url = (
+        f"http://{common['influxdb_server']}:{common['influxdb_port']}"  # noqa: E231
+    )
     influxdb_token = common["influxdb_api_key"]
     influxdb_org = common["influxdb_org"]
     influxdb_bucket = common["influxdb_bucket"]
@@ -135,14 +140,20 @@ def run_weather_job():
                 )
                 if common.get("enable_healthcheck", "false") == "true":
                     try:
-                        requests.get(f"https://hc-ping.com/{common['hc_guid']}", timeout=10)
-                        logging.info(f"Healthchecks ping sent successfully!")
+                        requests.get(
+                            f"https://hc-ping.com/{common['hc_guid']}",  # noqa: E231
+                            timeout=10,
+                        )
+                        logging.info("Healthchecks ping sent successfully!")
                     except requests.RequestException as e:
                         logging.critical(f"Failed to ping healthcheck: {e}")
                         print("Ping failed: %s" % e)
             else:
                 logging.critical(f"No weather data retrieved for {_loc}")
-                sys.exit(f"There was an issue retrieving weather data for location {_loc}")
+                sys.exit(
+                    f"There was an issue retrieving weather data for location {_loc}"
+                )
+
 
 if __name__ == "__main__":
     run_weather_job()

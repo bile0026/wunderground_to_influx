@@ -10,7 +10,9 @@ config.read("config.ini")
 interval = int(config["COMMON"]["interval"])
 
 # Setup logging if needed
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 logging.info("Weather app started successfully...")
 print("Weather app started successfully...")
