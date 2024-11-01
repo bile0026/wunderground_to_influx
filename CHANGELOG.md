@@ -1,6 +1,23 @@
 # CHANGELOG
 
 
+## v0.5.0 (2024-11-01)
+
+### Documentation
+
+* docs: 📝 add development instructions ([`93da9ae`](https://github.com/bile0026/wunderground_to_influx/commit/93da9ae9d3becbc26f484d367f549bc5a44f4eab))
+
+### Features
+
+* feat: ✨ add pre-commit hooks and cleanup syntax ([`f94be4b`](https://github.com/bile0026/wunderground_to_influx/commit/f94be4b13a99778901ec4df44e21b57fabca2204))
+
+### Unknown
+
+* Merge pull request #5 from bile0026/develop
+
+feat: ✨ add pre-commit hooks and cleanup syntax ([`75cc47c`](https://github.com/bile0026/wunderground_to_influx/commit/75cc47c106ac6081da5a712cee956935fbda8203))
+
+
 ## v0.4.0 (2024-10-24)
 
 ### Features
