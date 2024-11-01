@@ -12,3 +12,4 @@ services:
       # - logs/cron.log:/var/log/cron.log  # Bind-mount for cron logs (optional)
     environment:
       POETRY_VIRTUALENVS_CREATE: "false"  # Set Poetry environment variables if necessary
+      TZ: "America/Chicago"
