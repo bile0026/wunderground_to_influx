@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v0.5.1 (2024-11-01)
+
+### Bug Fixes
+
+* fix: 🐛 add timezone to container ([`4e2e183`](https://github.com/bile0026/wunderground_to_influx/commit/4e2e183d1d0f210585e2495f5e5d7fb23c6bb648))
+
+### Unknown
+
+* Merge pull request #6 from bile0026:develop
+
+fix: 🐛 add timezone to container ([`c2b0cb3`](https://github.com/bile0026/wunderground_to_influx/commit/c2b0cb3d5aff9624ced68e38aad6591b0b9e73aa))
+
+
 ## v0.5.0 (2024-11-01)
 
 ### Documentation
