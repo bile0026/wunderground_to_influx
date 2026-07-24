@@ -12,12 +12,32 @@ hc_guid =
 # e for english, m for metric, h for hybrid
 unit_of_measure = e
 
-# influxdb parameters to write data
+# InfluxDB backend. Set enabled = false to stop writing to InfluxDB (e.g. once
+# you have fully migrated to OpenObserve). Enabled by default.
+[influxdb]
+enabled = true
 influxdb_server = 127.0.0.1
 influxdb_port = 8086
 influxdb_api_key = NotAStrongToken0=
 influxdb_org = home
 influxdb_bucket = weather-data
+
+# OpenObserve backend. Enable to write metrics to OpenObserve, either alongside
+# InfluxDB (dual-write while migrating) or on its own. Data is ingested as
+# native metrics (each numeric field becomes a weather_<field> gauge with tags
+# as attributes) via the OTLP/HTTP JSON endpoint /api/{org}/v1/metrics.
+# Authentication uses HTTP basic auth with an OpenObserve user email plus its
+# password or ingestion token. Leave openobserve_port blank to use the scheme
+# default port (e.g. 443 behind an HTTPS reverse proxy).
+[openobserve]
+enabled = false
+openobserve_scheme = http
+openobserve_server = 127.0.0.1
+openobserve_port = 5080
+openobserve_org = default
+openobserve_user = root@example.com
+openobserve_password = your_openobserve_password_or_token
+verify_ssl = false
 
 [LOCATION1]
 station_id = KWIOCONO117
