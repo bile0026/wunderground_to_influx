@@ -20,8 +20,22 @@ logging.basicConfig(
 logging.info("Script setup complete!")
 
 
+class WeatherAPIAuthError(Exception):
+    """Raised when the Wunderground API rejects the API key (HTTP 401).
+
+    A 401 means the key has expired or is invalid, which is a definitive
+    failure (not a transient outage) that affects every location, so the caller
+    treats it specially: signal a failure healthcheck and never a success one.
+    """
+
+
 def get_weather_data(station_id, units, wu_api_key):
-    """Get current weather data for a given station ID."""
+    """Get current weather data for a given station ID.
+
+    Returns the parsed JSON on success, or ``None`` on a transient/other
+    failure. Raises :class:`WeatherAPIAuthError` on a 401 so the caller can
+    distinguish an expired/invalid API key from a temporary Wunderground outage.
+    """
     base_url = "https://api.weather.com/v2/pws/observations/current"
     params = {
         "stationId": station_id,
@@ -34,6 +48,13 @@ def get_weather_data(station_id, units, wu_api_key):
 
     try:
         response = requests.get(base_url, params=params, timeout=30)
+        # Check 401 before raise_for_status() so it surfaces as a distinct
+        # auth error rather than a generic RequestException.
+        if response.status_code == 401:
+            raise WeatherAPIAuthError(
+                f"Wunderground API returned 401 for {station_id}: "
+                "API key expired or invalid"
+            )
         response.raise_for_status()
         _weather_data = response.json()
         return _weather_data
@@ -383,6 +404,26 @@ def read_config(config_file: str = "config.ini") -> Dict[str, Any]:
     }
 
 
+def send_healthcheck(hc_guid: str, success: bool = True):
+    """Ping Healthchecks.io for this job run.
+
+    ``success=True`` sends the normal "up" ping. ``success=False`` hits the
+    ``/fail`` endpoint, which immediately flags the check as down (used when the
+    API key has expired) instead of waiting for the grace period to elapse.
+    """
+    url = f"https://hc-ping.com/{hc_guid}"  # noqa: E231
+    if not success:
+        url += "/fail"
+    try:
+        requests.get(url, timeout=10)
+        logging.info(
+            "Healthchecks %s ping sent successfully!",
+            "fail" if not success else "success",
+        )
+    except requests.RequestException as e:
+        logging.critical(f"Failed to ping healthcheck: {e}")
+
+
 def run_weather_job():
     """Main function to gather weather data and write to the enabled backends."""
 
@@ -442,7 +483,16 @@ def run_weather_job():
         if _loc == "":
             continue
 
-        weather_data = get_weather_data(_loc, unit_of_measure, api_key)
+        try:
+            weather_data = get_weather_data(_loc, unit_of_measure, api_key)
+        except WeatherAPIAuthError as e:
+            # An expired/invalid API key affects every location (they share one
+            # key), so signal a failure to Healthchecks -- never a success --
+            # and stop this cycle instead of hammering the API with more 401s.
+            logging.critical(str(e))
+            if enable_healthcheck:
+                send_healthcheck(hc_guid, success=False)
+            return
 
         if not weather_data:
             # Skip this location for this cycle rather than exiting: a bad key
@@ -467,15 +517,7 @@ def run_weather_job():
                 logging.error(f"Failed to write {location} data to {name}: {e}")
 
         if enable_healthcheck and write_ok:
-            try:
-                requests.get(
-                    f"https://hc-ping.com/{hc_guid}",  # noqa: E231
-                    timeout=10,
-                )
-                logging.info("Healthchecks ping sent successfully!")
-            except requests.RequestException as e:
-                logging.critical(f"Failed to ping healthcheck: {e}")
-                print("Ping failed: %s" % e)
+            send_healthcheck(hc_guid, success=True)
 
 
 if __name__ == "__main__":
